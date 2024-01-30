@@ -8,14 +8,6 @@ import bson
 router = APIRouter()
 
 
-@router.get("/{blog_id}", response_model=blog_schema.BlogPublic)
-async def read_blog(blog_id: str):
-    blog = database.get_blog(blog_id)
-    if not blog:
-        raise HTTPException(status_code=404, detail="Blog not found")
-    return blog
-
-
 @router.get("/", response_model=List[blog_schema.BlogPublic])
 async def read_all_blogs():
     return database.list_blogs()
@@ -40,11 +32,23 @@ async def create_blog(blog: blog_schema.BlogCreate, current_user: user_schema.Us
 async def update_blog(blog_id: str, blog_update: blog_schema.BlogUpdate, current_user: user_schema.UserPublic = Depends(auth.get_current_user)):
     update_result = database.update_blog(
         blog_id, blog_update.dict(exclude_unset=True))
+    blog = database.get_blog(blog_id)
+    if blog['author'] != current_user["_id"]:
+        raise HTTPException(
+            status_code=401, detail="Cannot access this blog as it belongs to other user.")
     if not update_result:
         raise HTTPException(
             status_code=404, detail="Blog not found or update failed")
     updated_blog = database.get_blog(blog_id)
     return updated_blog
+
+
+@router.get("/{blog_id}", response_model=blog_schema.BlogPublic)
+async def read_blog(blog_id: str):
+    blog = database.get_blog(blog_id)
+    if not blog:
+        raise HTTPException(status_code=404, detail="Blog not found")
+    return blog
 
 
 @router.delete("/{blog_id}", response_model=dict)

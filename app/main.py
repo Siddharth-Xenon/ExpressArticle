@@ -23,7 +23,9 @@ if __name__ == "__main__":
 '''
 NOTES:
 1.Convert time into readable format before returning.
-2.unique username
-3. current user cant update other users
-4. update only your own blogs
+2. update token['sub'] when username changed.
+3. 
+6. Retrieve all blogs (with pagination)
+7.Dashboard:
+
 '''

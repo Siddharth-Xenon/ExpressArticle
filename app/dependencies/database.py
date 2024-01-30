@@ -36,9 +36,6 @@ def get_user_by_id(user_id: str):
 def update_user(user_id, update_data):
     try:
         # Separate the tag updates from other user data
-        tags_to_add = update_data.pop('add_tags', [])
-        tags_to_remove = update_data.pop('remove_tags', [])
-
         updated = False
 
         # Update general user details
@@ -47,19 +44,27 @@ def update_user(user_id, update_data):
                 {"_id": ObjectId(user_id)}, {"$set": update_data})
             updated = result.modified_count > 0
 
-        # Add tags to the user's tag list
+        return updated
+    except errors.PyMongoError as e:
+        print(f"Error updating user: {e}")
+        return False
+
+
+def update_tags(user_id, update_data):
+    tags_to_add = update_data.pop('add_tags', [])
+    tags_to_remove = update_data.pop('remove_tags', [])
+
+    try:
         if tags_to_add:
             result = db.users.update_one({"_id": ObjectId(user_id)}, {
-                                         "$addToSet": {"user_tags": {"$each": tags_to_add}}})
-            updated = updated or result.modified_count > 0
+                "$addToSet": {"user_tags": {"$each": tags_to_add}}})
 
-        # Remove tags from the user's tag list
+            # Remove tags from the user's tag list
         if tags_to_remove:
             result = db.users.update_one({"_id": ObjectId(user_id)}, {
-                                         "$pullAll": {"user_tags": tags_to_remove}})
-            updated = updated or result.modified_count > 0
-
-        return updated
+                "$pullAll": {"user_tags": tags_to_remove}})
+        result = db.users.find_one({"_id": ObjectId(user_id)})
+        return result
     except errors.PyMongoError as e:
         print(f"Error updating user: {e}")
         return False
@@ -139,7 +144,7 @@ blog_data = {
     "author": "test"
 }
 
-print(update_blog("65b8a3bfb99ac8dded939116", blog_data))
+# print(update_blog("65b8a3bfb99ac8dded939116", blog_data))
 
 # user_data = {
 #     "username": "user123",
@@ -148,5 +153,9 @@ print(update_blog("65b8a3bfb99ac8dded939116", blog_data))
 #     "remove_tags": ["coding"]
 # }
 
+data = {
+    "remove_tags": ["chess"]
+}
 
 # print(update_user(get_user_id("user123"), user_data))
+print(update_tags(get_user_id("admin"), data))

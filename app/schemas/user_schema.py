@@ -52,3 +52,8 @@ class UserPublic(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UpdateUserTags(BaseModel):
+    add_tags: List[str] = Field(..., example=["Python", "Web Development"])
+    remove_tags: List[str] = Field(..., example=["Python", "Web Development"])

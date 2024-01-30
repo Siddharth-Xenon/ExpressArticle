@@ -9,7 +9,6 @@ router = APIRouter()
 
 @router.post("/register", response_model=user_schema.UserPublic)
 async def register_user(user: user_schema.UserCreate):
-    print("Registering")
     # Hash the user password
     hashed_password = auth.get_password_hash(user.password)
 
@@ -17,6 +16,12 @@ async def register_user(user: user_schema.UserCreate):
     user_data = user.dict(exclude_unset=True)
     del user_data['password']  # Remove the plain password
     user_data['hashed_password'] = hashed_password
+
+    existing_user = database.get_user_by_id(
+        database.get_user_id(user_data["username"]))
+    if existing_user:
+        raise HTTPException(
+            status_code=400, detail="User already exists")
 
     # Create a new user in the database
     new_user_id = database.create_user(user_data)
