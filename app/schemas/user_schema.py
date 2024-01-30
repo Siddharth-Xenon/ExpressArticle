@@ -10,6 +10,10 @@ class Token(BaseModel):
     token_type: str = Field(..., example="bearer")
 
 
+class TokenData(BaseModel):
+    username: str | None = None
+
+
 class UserCreate(BaseModel):
     username: str = Field(..., example="user123")
     email: EmailStr = Field(..., example="user123@example.com")
@@ -31,6 +35,7 @@ class UserLogin(BaseModel):
 
 class UserUpdate(BaseModel):
     first_name: Optional[str] = Field(None, example="John")
+    username: Optional[str] = Field(None, example="user123")
     last_name: Optional[str] = Field(None, example="Doe")
     user_tags: Optional[List[str]] = Field(
         None, example=["coding", "photography"])

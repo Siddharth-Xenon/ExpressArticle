@@ -2,10 +2,7 @@ fastapi
 bson
 pymongo
 uvicorn
-pyjwt
-jose
-python-jose-cryptodome
 passlib[bcrypt]
 pydantic[email]
 python-multipart
-bcrypt==4.0.1
+python-jose[cryptography]

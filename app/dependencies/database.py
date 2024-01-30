@@ -1,6 +1,7 @@
 from pymongo import MongoClient, errors
 from bson import ObjectId, json_util
 from datetime import datetime
+import bson
 from bson import ObjectId, datetime as bson_datetime
 
 # MongoDB configuration (You should replace these with your configuration)
@@ -33,7 +34,6 @@ def get_user_by_id(user_id: str):
 
 
 def update_user(user_id, update_data):
-
     try:
         # Separate the tag updates from other user data
         tags_to_add = update_data.pop('add_tags', [])
@@ -92,7 +92,7 @@ def get_blog(blog_id):
     try:
         result = db.blogs.find_one({"_id": ObjectId(blog_id)})
         if result:
-            result["_id"] = str(result["_id"])
+            result["id"] = str(result["_id"])
             return result
         return None
     except errors.PyMongoError as e:
@@ -102,6 +102,7 @@ def get_blog(blog_id):
 
 def update_blog(blog_id, update_data):
     try:
+        update_data["updated_on"] = bson.datetime.datetime.utcnow()
         result = db.blogs.update_one(
             {"_id": ObjectId(blog_id)}, {"$set": update_data})
         return result.modified_count > 0
@@ -122,7 +123,7 @@ def delete_blog(blog_id):
 def list_blogs():
     try:
         blogs = db.blogs.find()
-        return [{"_id": str(blog["_id"]), **blog} for blog in blogs]
+        return [{"id": str(blog["_id"]), **blog} for blog in blogs]
     except errors.PyMongoError as e:
         print(f"Error listing blogs: {e}")
         return []
@@ -133,21 +134,19 @@ blog_data = {
     "description": "A comprehensive guide to FastAPI",
     "pages": 120,
     "content": "Content of the blog...",
-    "published": bson_datetime.datetime(2021, 1, 1),
-    "updated_on": bson_datetime.datetime(2021, 1, 2),
     "tags": ["Python", "Web Development"],
     "language": "English",
-    "author": ObjectId('507f191e810c19729de860ea')
+    "author": "test"
 }
 
-# print(delete_blog("65b807f9a07c322614d74a37"))
+print(update_blog("65b8a3bfb99ac8dded939116", blog_data))
 
-user_data = {
-    "username": "user123",
-    "first_name": "Sid",
-    "add_tags": ["nature"],
-    "remove_tags": ["coding"]
-}
+# user_data = {
+#     "username": "user123",
+#     "first_name": "Sid",
+#     "add_tags": ["nature"],
+#     "remove_tags": ["coding"]
+# }
 
 
-print(update_user(get_user_id("user123"), user_data))
+# print(update_user(get_user_id("user123"), user_data))
