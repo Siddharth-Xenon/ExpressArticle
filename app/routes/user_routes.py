@@ -23,6 +23,9 @@ async def update_user_profile(user_update: user_schema.UserUpdate, current_user:
         updated_user_data['hashed_password'] = auth.get_password_hash(
             updated_user_data.pop('password'))
 
+    if 'username' in updated_user_data:
+        pass
+
     update_result = database.update_user(user_id, updated_user_data)
     if not update_result:
         raise HTTPException(

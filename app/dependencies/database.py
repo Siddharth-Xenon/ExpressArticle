@@ -21,7 +21,6 @@ def create_user(user_data):
 
 def get_user_by_id(user_id: str):
     try:
-        # Convert user_id to ObjectId for querying MongoDB
         result = db.users.find_one({"_id": ObjectId(user_id)})
         if result:
             # Convert ObjectId back to string for JSON serialization
@@ -35,10 +34,7 @@ def get_user_by_id(user_id: str):
 
 def update_user(user_id, update_data):
     try:
-        # Separate the tag updates from other user data
         updated = False
-
-        # Update general user details
         if update_data:
             result = db.users.update_one(
                 {"_id": ObjectId(user_id)}, {"$set": update_data})
@@ -59,7 +55,6 @@ def update_tags(user_id, update_data):
             result = db.users.update_one({"_id": ObjectId(user_id)}, {
                 "$addToSet": {"user_tags": {"$each": tags_to_add}}})
 
-            # Remove tags from the user's tag list
         if tags_to_remove:
             result = db.users.update_one({"_id": ObjectId(user_id)}, {
                 "$pullAll": {"user_tags": tags_to_remove}})
@@ -72,7 +67,6 @@ def update_tags(user_id, update_data):
 
 def get_user_id(email_or_username):
     try:
-        # Query to find a user by username or email
         user = db.users.find_one(
             {"$or": [{"username": email_or_username}, {"email": email_or_username}]})
         if user:
@@ -125,24 +119,24 @@ def delete_blog(blog_id):
         return False
 
 
-def list_blogs():
+def list_blogs(skip: int, limit: int):
     try:
-        blogs = db.blogs.find()
+        blogs = db.blogs.find().skip(skip).limit(limit)
         return [{"id": str(blog["_id"]), **blog} for blog in blogs]
     except errors.PyMongoError as e:
         print(f"Error listing blogs: {e}")
         return []
 
 
-blog_data = {
-    "blog_name": "updating FastAPI",
-    "description": "A comprehensive guide to FastAPI",
-    "pages": 120,
-    "content": "Content of the blog...",
-    "tags": ["Python", "Web Development"],
-    "language": "English",
-    "author": "test"
-}
+# blog_data = {
+#     "blog_name": "updating FastAPI",
+#     "description": "A comprehensive guide to FastAPI",
+#     "pages": 120,
+#     "content": "Content of the blog...",
+#     "tags": ["Python", "Web Development"],
+#     "language": "English",
+#     "author": "test"
+# }
 
 # print(update_blog("65b8a3bfb99ac8dded939116", blog_data))
 
@@ -158,4 +152,4 @@ data = {
 }
 
 # print(update_user(get_user_id("user123"), user_data))
-print(update_tags(get_user_id("admin"), data))
+# print(update_tags(get_user_id("admin"), data))

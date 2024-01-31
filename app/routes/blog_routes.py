@@ -1,5 +1,5 @@
-from fastapi import APIRouter, HTTPException, Depends
-from typing import List
+from fastapi import APIRouter, HTTPException, Depends, Query
+from typing import List, Optional
 from schemas import blog_schema, user_schema
 from dependencies import database, auth
 from datetime import datetime
@@ -9,8 +9,12 @@ router = APIRouter()
 
 
 @router.get("/", response_model=List[blog_schema.BlogPublic])
-async def read_all_blogs():
-    return database.list_blogs()
+async def read_all_blogs(
+    page: int = Query(1, ge=1, description="Page number, starting from 1"),
+    page_size: int = Query(10, ge=1, description="Number of blogs per page")
+):
+    skip = (page - 1) * page_size
+    return database.list_blogs(skip, page_size)
 
 
 @router.post("/", response_model=blog_schema.BlogPublic)

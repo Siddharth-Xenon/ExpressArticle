@@ -12,7 +12,7 @@ async def register_user(user: user_schema.UserCreate):
     # Hash the user password
     hashed_password = auth.get_password_hash(user.password)
 
-    # Exclude unset fields, remove plain password, and add hashed password
+    # remove plain password, and add hashed password
     user_data = user.dict(exclude_unset=True)
     del user_data['password']  # Remove the plain password
     user_data['hashed_password'] = hashed_password
@@ -29,7 +29,6 @@ async def register_user(user: user_schema.UserCreate):
         raise HTTPException(
             status_code=400, detail="Error in user registration")
 
-    # Prepare the response data
     response_data = user_data.copy()
     response_data.update({"id": new_user_id})
     del response_data['hashed_password']

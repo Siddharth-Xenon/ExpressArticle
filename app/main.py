@@ -24,8 +24,6 @@ if __name__ == "__main__":
 NOTES:
 1.Convert time into readable format before returning.
 2. update token['sub'] when username changed.
-3. 
-6. Retrieve all blogs (with pagination)
 7.Dashboard:
 
 '''
