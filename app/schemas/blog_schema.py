@@ -42,3 +42,7 @@ class BlogPublic(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class DashboardResponse(BaseModel):
+    blogs: BlogPublic

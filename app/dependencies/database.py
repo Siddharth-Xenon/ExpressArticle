@@ -3,6 +3,7 @@ from bson import ObjectId, json_util
 from datetime import datetime
 import bson
 from bson import ObjectId, datetime as bson_datetime
+from utils.common_utils import calculate_relevance
 
 # MongoDB configuration (You should replace these with your configuration)
 client = MongoClient(
@@ -128,6 +129,66 @@ def list_blogs(skip: int, limit: int):
         return []
 
 
+def get_user_tags(user_id):
+    # Fetch user's followed tags from the database
+    # Return a list of tags
+    try:
+        user = db.users.find_one({"_id": ObjectId(user_id)})
+        return user["user_tags"]
+    except errors.PyMongoError as e:
+        print(f"Error while getting user tags: {e}")
+
+
+# def get_blogs_by_tags(tags, page, limit, sort_by):
+#     blogs = db["blogs"]
+#     query = {"tags": {"$in": tags}}
+#     if sort_by == "relevance":
+#         # sort_logic = # Define your relevance logic here
+#         pass
+#     else:
+#         sort_logic = [("published", -1)]  # Default to sorting by publish date
+#     skip = (page - 1) * limit
+#     # Fetch blogs
+#     fetched_blogs = blogs.find(query).sort(sort_logic).skip(skip).limit(limit)
+#     blogs_with_relevance = [(blog, calculate_relevance(blog, tags))
+#                             for blog in fetched_blogs]
+
+#     # Sort blogs by relevance score in descending order
+#     sorted_blogs = sorted(blogs_with_relevance,
+#                           key=lambda x: x[1], reverse=True)
+#     # Extract the sorted blogs, discarding relevance scores
+#     sorted_blogs = [{"id": str(blog["_id"]), **blog}
+#                     for blog, relevance in sorted_blogs]
+#     return sorted_blogs
+
+def get_blogs_by_tags(tags, page, limit, sort_by):
+    blogs = db["blogs"]
+    query = {"tags": {"$in": tags}}
+
+    # Fetch all blogs matching the tags
+    fetched_blogs = list(blogs.find(query))
+
+    if sort_by == "relevance":
+        # Calculate relevance for each blog and then sort
+        blogs_with_relevance = [
+            (blog, calculate_relevance(blog, tags)) for blog in fetched_blogs]
+        sorted_blogs = sorted(blogs_with_relevance,
+                              key=lambda x: x[1], reverse=False)
+
+        # Extract the sorted blogs, discarding relevance scores
+        sorted_blogs = [blog for blog, relevance in sorted_blogs]
+    else:
+        # Default to sorting by publish date
+        sorted_blogs = fetched_blogs
+
+    # Apply pagination after sorting
+    start = (page - 1) * limit
+    end = start + limit
+    paginated_blogs = sorted_blogs[start:end]
+
+    return [{"id": str(blog["_id"]), **blog} for blog in paginated_blogs]
+
+
 # blog_data = {
 #     "blog_name": "updating FastAPI",
 #     "description": "A comprehensive guide to FastAPI",
@@ -137,19 +198,13 @@ def list_blogs(skip: int, limit: int):
 #     "language": "English",
 #     "author": "test"
 # }
-
 # print(update_blog("65b8a3bfb99ac8dded939116", blog_data))
-
 # user_data = {
 #     "username": "user123",
 #     "first_name": "Sid",
 #     "add_tags": ["nature"],
 #     "remove_tags": ["coding"]
 # }
-
-data = {
-    "remove_tags": ["chess"]
-}
-
 # print(update_user(get_user_id("user123"), user_data))
 # print(update_tags(get_user_id("admin"), data))
+print(get_user_tags("65ba08758450fa3e3545a5bc"))

@@ -4,8 +4,16 @@ from schemas import blog_schema, user_schema
 from dependencies import database, auth
 from datetime import datetime
 import bson
-
+from bson import ObjectId
+from dependencies import auth
 router = APIRouter()
+
+
+@router.get("/dashboard", response_model=list[blog_schema.BlogPublic])
+async def get_blogs(page: int = 1, page_size: int = 10, current_user: user_schema.UserPublic = Depends(auth.get_current_user)):
+    user_tags = database.get_user_tags(current_user["_id"])
+    blogs = database.get_blogs_by_tags(user_tags, page, page_size, "relevance")
+    return [blog for blog in blogs]
 
 
 @router.get("/", response_model=List[blog_schema.BlogPublic])
