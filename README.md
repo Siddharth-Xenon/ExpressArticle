@@ -53,7 +53,7 @@ uvicorn src:main:app --reload
 - **Method:** `PUT`
 - **Authorization:** Requires a valid JWT token.   
 - **Description:**
-&nbsp;
+&nbsp;  
 - **Path:** `/user/profile`
 - **Method:** `GET`
 - **Authorization:** Requires a valid JWT token.   
