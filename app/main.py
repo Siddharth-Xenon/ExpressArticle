@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import uvicorn
 # Import your route modules here (assuming you have user_routes and blog_routes)
 from routes import user_routes, blog_routes, auth_routes
 
@@ -16,6 +17,5 @@ async def root():
     return {"message": "Hello, World from Blog API!"}
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
 
