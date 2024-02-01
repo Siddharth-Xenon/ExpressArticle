@@ -1,30 +1,32 @@
-## BLOG RESTAPi with FastAPi
+## EXPRESS Article RESTAPi with FastAPi
 
-Backend for Blog App with various endpoints including user management, Blogs and User Dashboard powered by mongodb as the database
+Express Article is a Backend for Blog app with various endpoints including user management, Blog and User Dashboard powered by Mongodb as the database
 
 ### SETUP
-
-- Clone this repository  
-- Create a Virtual environment and Activate it  (Optional)
-```bash
-python -m venv .venv  
-. .venv/bin/activate  
-```
-- Install the necessary dependencies 
+- **Set Up a Virtual Environment**
+   - For Windows:
+     ```
+     python -m venv my_venv
+     .\my_venv\Scripts\activate
+     ```
+   - For Unix or MacOS:
+     ```
+     python3 -m venv venv
+     source venv/bin/activate
+     ```
+- **Install the necessary dependencies**
 ```bash
 pip install -r requirements.txt  
 ``` 
 - Create an .env file  
 ```bash 
-MONGODB_URL=mongodb://localhost:27017
-SECRET= <Your secret for JWT>
+MONGO_USER=sidsolanki920
+MONGO_PASS=8493
 ```
-- Optionally rename the db name and collections name in src/database.py as per your wish (Optional)
-
-**Make sure you have mongodb installed locally**  
   
 - Run the server  
 ```bash
+cd ./app
 uvicorn src:main:app --reload
 ```
 - If everything went fine, Success message will be logged and server will listen on port 8000  
@@ -33,56 +35,49 @@ uvicorn src:main:app --reload
 ### Usage
 
 #### Endpoints
-
-All routes are mounted over /api/v1  
-Hit up /api/v1/docs to see the swagger documentaion of the project  
-
-##### 1. Dashboard
-
-- **Path:** `/dashboard`
-- **Method:** `GET`
-- **Authorization:** Requires a valid JWT token.
-
-##### 2. Accounts
-
-- **Path:** `/accounts/login`
+##### 1. Authentication
+- **Path:** `/login`
 - **Methods:** `POST` (Login)
 - **Authorization:** None    
+- **Description:** User login     
 &nbsp;
-- **Path:** `/accounts/register`
+- **Path:** `/register`
 - **Method:** `POST`
-- **Authorization:** None    
-&nbsp;  
-- **Path:** `/accounts/logout`
-- **Method:** `GET`
-- **Authorization:** Requires a valid JWT token.    
-&nbsp;
-- **Path:** `/accounts/update`
+- **Authorization:** None
+- **Description:** Register a new user  
+
+##### 2. User
+
+- **Path:** `/user/update`
 - **Method:** `PUT`
-- **Authorization:** Requires a valid JWT token.    
+- **Authorization:** Requires a valid JWT token.   
+- **Description:**
 &nbsp;
-- **Path:** `/accounts/profile`
+- **Path:** `/user/profile`
 - **Method:** `GET`
 - **Authorization:** Requires a valid JWT token.   
 
 ##### 3. Blogs
-
+- **Path:** `blog/dashboard`
+- **Method:** `GET`
+- **Authorization:** Requires a valid JWT token.  
+&nbsp;  
 - **Path:** `/blogs?page=..&limit=..`            Page and limit are intergers for pagination
 - **Methods:** `GET` 
 - **Authorization:** None    
-   &nbsp;
+&nbsp;  
 - **Path:** `/blogs/retrieve/{blog_id}`           blog_id corresponds to unique id of the blog 
 - **Method:** `GET`
 - **Authorization:** None    
-     &nbsp;
+&nbsp;  
 - **Path:** `/blogs/create`
 - **Method:** `POST`
-- **Authorization:** Requires a valid JWT token.
-&nbsp;
+- **Authorization:** Requires a valid JWT token.  
+&nbsp;  
 - **Path:** `/blogs/update/{blog_id}`            blog_id corresponds to unique id of the blog    
 - **Method:** `PUT`
-- **Authorization:** Requires a valid JWT token and should be the author
-&nbsp;
+- **Authorization:** Requires a valid JWT token and should be the author  
+&nbsp;  
 - **Path:** `/blogs/remove/{blog_id}`            blog_id corresponds to unique id of the blog    
 - **Method:** `DELETE`
 - **Authorization:** Requires a valid JWT token and should be the author
@@ -93,11 +88,11 @@ Hit up /api/v1/docs to see the swagger documentaion of the project
 
 To run it as a container, Simply Run   
 ```bash
-sudo docker compose up
+docker-compose up
 ```
 If current user is in docker group, Following is enough  
 ```bash
-docker compose up
+docker-compose up
 ```
 
  
