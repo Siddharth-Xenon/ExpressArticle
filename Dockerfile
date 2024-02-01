@@ -1,1 +1,23 @@
- 
+# Use an official Python runtime as a parent image
+FROM python:3.11.5
+
+# Set the working directory in the container
+WORKDIR /usr/src/blogAPI
+
+# Copy the current directory contents into the container at /usr/src/app
+COPY . .
+
+# Navigate to the app directory
+WORKDIR /usr/src/blogAPI/app
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir fastapi bson pymongo uvicorn "passlib[bcrypt]" "pydantic[email]" python-multipart "python-jose[cryptography]"
+
+# Make port 8000 available to the world outside this container
+EXPOSE 8000
+
+# Define environment variable to hold the name of the application file
+ENV UVICORN_APP="main:app"
+
+# Run uvicorn when the container launches
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

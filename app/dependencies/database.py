@@ -139,54 +139,45 @@ def get_user_tags(user_id):
         print(f"Error while getting user tags: {e}")
 
 
-# def get_blogs_by_tags(tags, page, limit, sort_by):
-#     blogs = db["blogs"]
-#     query = {"tags": {"$in": tags}}
-#     if sort_by == "relevance":
-#         # sort_logic = # Define your relevance logic here
-#         pass
-#     else:
-#         sort_logic = [("published", -1)]  # Default to sorting by publish date
-#     skip = (page - 1) * limit
-#     # Fetch blogs
-#     fetched_blogs = blogs.find(query).sort(sort_logic).skip(skip).limit(limit)
-#     blogs_with_relevance = [(blog, calculate_relevance(blog, tags))
-#                             for blog in fetched_blogs]
-
-#     # Sort blogs by relevance score in descending order
-#     sorted_blogs = sorted(blogs_with_relevance,
-#                           key=lambda x: x[1], reverse=True)
-#     # Extract the sorted blogs, discarding relevance scores
-#     sorted_blogs = [{"id": str(blog["_id"]), **blog}
-#                     for blog, relevance in sorted_blogs]
-#     return sorted_blogs
-
-def get_blogs_by_tags(tags, page, limit, sort_by):
+def get_blogs_by_tags(tags, page, limit):
     blogs = db["blogs"]
-    query = {"tags": {"$in": tags}}
 
-    # Fetch all blogs matching the tags
-    fetched_blogs = list(blogs.find(query))
+    # Aggregation pipeline
+    pipeline = [
+        {
+            # Fetch documents with similar tags
+            '$match': {'tags': {'$in': tags}}
+        },
+        {
+            # field that contains the intersection size
+            '$project': {
+                'blog': '$$ROOT',
+                'intersectionSize': {
+                    '$size': {
+                        '$setIntersection': ['$tags', tags]
+                    }
+                }
+            }
+        },
+        {
+            # Sort by the size of the intersection
+            '$sort': {'intersectionSize': -1}
+        },
+        {
+            # Pagination
+            '$skip': (page - 1) * limit
+        },
+        {
+            '$limit': limit
+        }
+    ]
 
-    if sort_by == "relevance":
-        # Calculate relevance for each blog and then sort
-        blogs_with_relevance = [
-            (blog, calculate_relevance(blog, tags)) for blog in fetched_blogs]
-        sorted_blogs = sorted(blogs_with_relevance,
-                              key=lambda x: x[1], reverse=False)
+    result = blogs.aggregate(pipeline)
 
-        # Extract the sorted blogs, discarding relevance scores
-        sorted_blogs = [blog for blog, relevance in sorted_blogs]
-    else:
-        # Default to sorting by publish date
-        sorted_blogs = fetched_blogs
-
-    # Apply pagination after sorting
-    start = (page - 1) * limit
-    end = start + limit
-    paginated_blogs = sorted_blogs[start:end]
-
-    return [{"id": str(blog["_id"]), **blog} for blog in paginated_blogs]
+    paginated_blogs = [
+        {'id': str(blog['blog']['_id']), **blog['blog']} for blog in result]
+    print(paginated_blogs)
+    return paginated_blogs
 
 
 # blog_data = {
@@ -199,6 +190,8 @@ def get_blogs_by_tags(tags, page, limit, sort_by):
 #     "author": "test"
 # }
 # print(update_blog("65b8a3bfb99ac8dded939116", blog_data))
+
+
 # user_data = {
 #     "username": "user123",
 #     "first_name": "Sid",
@@ -207,4 +200,4 @@ def get_blogs_by_tags(tags, page, limit, sort_by):
 # }
 # print(update_user(get_user_id("user123"), user_data))
 # print(update_tags(get_user_id("admin"), data))
-print(get_user_tags("65ba08758450fa3e3545a5bc"))
+# print(get_user_tags("65ba08758450fa3e3545a5bc"))
