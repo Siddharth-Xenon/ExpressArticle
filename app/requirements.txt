@@ -1,5 +1,4 @@
 fastapi 
-bson
 pymongo
 uvicorn
 passlib[bcrypt]

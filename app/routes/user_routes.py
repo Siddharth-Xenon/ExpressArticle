@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.put("/", response_model=user_schema.UserPublic)
 async def update_user_profile(user_update: user_schema.UserUpdate, current_user: user_schema.UserPublic = Depends(auth.get_current_user)):
-    # Here, add logic to ensure that the current user is allowed to update the specified user profile
+    
     user_id = current_user["_id"]
     if current_user["_id"] != user_id:
         raise HTTPException(
@@ -32,7 +32,7 @@ async def update_user_profile(user_update: user_schema.UserUpdate, current_user:
             status_code=404, detail="User not found or update failed")
     user = database.get_user_by_id(user_id)
     return {**user, "id": user_id}
-# You can add more routes for other user-related functionalities
+
 
 
 @router.patch("/update-tags", response_model=user_schema.UserPublic)

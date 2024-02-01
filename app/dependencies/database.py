@@ -4,13 +4,14 @@ from datetime import datetime
 import bson
 from bson import ObjectId, datetime as bson_datetime
 from utils.common_utils import calculate_relevance
+from os import environ as env
 
 # MongoDB configuration (You should replace these with your configuration)
-client = MongoClient(
-    "mongodb+srv://sidsolanki920:8493@blogapi.gyqcnws.mongodb.net/")
+# client = MongoClient(f"mongodb+srv://sidsolanki920:8493@blogapi.gyqcnws.mongodb.net/")
+client = MongoClient(f"mongodb+srv://{env['MONGO_USER']}:{env['MONGO_PASS']}@blogapi.gyqcnws.mongodb.net/")
 db = client["blogAPI"]
 
-
+# print("updated")
 def create_user(user_data):
     try:
         result = db.users.insert_one(user_data)
@@ -176,28 +177,7 @@ def get_blogs_by_tags(tags, page, limit):
 
     paginated_blogs = [
         {'id': str(blog['blog']['_id']), **blog['blog']} for blog in result]
-    print(paginated_blogs)
+    # print(paginated_blogs)
     return paginated_blogs
 
 
-# blog_data = {
-#     "blog_name": "updating FastAPI",
-#     "description": "A comprehensive guide to FastAPI",
-#     "pages": 120,
-#     "content": "Content of the blog...",
-#     "tags": ["Python", "Web Development"],
-#     "language": "English",
-#     "author": "test"
-# }
-# print(update_blog("65b8a3bfb99ac8dded939116", blog_data))
-
-
-# user_data = {
-#     "username": "user123",
-#     "first_name": "Sid",
-#     "add_tags": ["nature"],
-#     "remove_tags": ["coding"]
-# }
-# print(update_user(get_user_id("user123"), user_data))
-# print(update_tags(get_user_id("admin"), data))
-# print(get_user_tags("65ba08758450fa3e3545a5bc"))

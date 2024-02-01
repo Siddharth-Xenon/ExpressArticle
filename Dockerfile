@@ -11,13 +11,15 @@ COPY . .
 WORKDIR /usr/src/blogAPI/app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir fastapi bson pymongo uvicorn "passlib[bcrypt]" "pydantic[email]" python-multipart "python-jose[cryptography]"
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
 
 # Define environment variable to hold the name of the application file
-ENV UVICORN_APP="main:app"
+ENV UVICORN_APP="main:app" \
+    MONGO_USER=sidsolanki920 \
+    MONGO_PASS=8493
 
 # Run uvicorn when the container launches
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
