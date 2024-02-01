@@ -18,8 +18,6 @@ EXPOSE 8000
 
 # Define environment variable to hold the name of the application file
 ENV UVICORN_APP="main:app" \
-    MONGO_USER=sidsolanki920 \
-    MONGO_PASS=8493
 
 # Run uvicorn when the container launches
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

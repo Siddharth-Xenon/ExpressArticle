@@ -65,6 +65,10 @@ async def read_blog(blog_id: str):
 
 @router.delete("/{blog_id}", response_model=dict)
 async def delete_blog(blog_id: str, current_user: user_schema.UserPublic = Depends(auth.get_current_user)):
+    blog = database.get_blog(blog_id)
+    if current_user['_id'] != blog["author"]:
+        raise HTTPException(
+            status_code=401, detail="You are not the owner of this blog")
     delete_result = database.delete_blog(blog_id)
     if not delete_result:
         raise HTTPException(
