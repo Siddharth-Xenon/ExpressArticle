@@ -2,7 +2,7 @@
 
 Express Article is a Backend for Blog app with various endpoints including user management, Blog and User Dashboard powered by Mongodb as the database
 ### Deployement 
-The API is deployed on Render and can be accessed at [https://expressarticle.onrender.com](https://expressarticle.onrender.com).
+The API is deployed on Render and can be accessed at [https://expressarticle.onrender.com](https://expressarticle.onrender.com/docs).
 ### SETUP
 - **Set Up a Virtual Environment**
    - For Windows:
