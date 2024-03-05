@@ -30,7 +30,7 @@ MONGO_PASS=8493
 cd ./app
 uvicorn src:main:app --reload
 ```
-- If everything went fine, Success message will be logged and server will listen on port 8000  
+- If everything went fine, Success message will be  logged and server will listen on port 8000  
 
 
 ### Usage
